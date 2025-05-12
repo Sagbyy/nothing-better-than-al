@@ -15,21 +15,28 @@ import { addDays, addMinutes, setHours, setMinutes } from 'date-fns';
 export class ScreeningService {
   private readonly logger = new Logger(ScreeningService.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createDto: CreateScreeningDTO) {
     const { movieId, movieTheaterId, start } = createDto;
 
     try {
-      const movie = await this.prisma.movie.findUnique({ where: { id: movieId } });
-      if (!movie) throw new NotFoundException(`Movie with ID ${movieId} not found`);
+      const movie = await this.prisma.movie.findUnique({
+        where: { id: movieId },
+      });
+      if (!movie)
+        throw new NotFoundException(`Movie with ID ${movieId} not found`);
 
-      const theater = await this.prisma.movieTheater.findUnique({ where: { id: movieTheaterId } });
-      if (!theater) throw new NotFoundException(`Theater with ID ${movieTheaterId} not found`);
+      const theater = await this.prisma.movieTheater.findUnique({
+        where: { id: movieTheaterId },
+      });
+      if (!theater)
+        throw new NotFoundException(
+          `Theater with ID ${movieTheaterId} not found`,
+        );
 
       const startDate = new Date(start);
       const endDate = addMinutes(startDate, movie.duration + 30);
-
 
       const conflict = await this.prisma.screening.findFirst({
         where: {
@@ -49,7 +56,9 @@ export class ScreeningService {
 
       const hour = startDate.getHours();
       if (hour < 9 || hour >= 24) {
-        throw new ConflictException('Vous ne pouvez pas créer de séance en dehors des horaires (9h-00h).');
+        throw new ConflictException(
+          'Vous ne pouvez pas créer de séance en dehors des horaires (9h-00h).',
+        );
       }
 
       const screening = await this.prisma.screening.create({
@@ -82,7 +91,6 @@ export class ScreeningService {
       skipDuplicates: true,
     });
   }
-
 
   async findAll() {
     return this.prisma.screening.findMany({
@@ -127,7 +135,7 @@ export class ScreeningService {
 
     if (!screenings) {
       const logger = new Logger('ScreeningService');
-      logger.warn(`Aucnune séance trouvé entre le ${start} et le ${end}`)
+      logger.warn(`Aucnune séance trouvé entre le ${start} et le ${end}`);
     }
 
     return screenings;
@@ -139,9 +147,6 @@ export class ScreeningService {
       select: { nb_ticket: true },
     });
   }
-
-
-
 
   async findOne(id: number) {
     const screening = await this.prisma.screening.findUnique({
@@ -190,5 +195,4 @@ export class ScreeningService {
     await this.prisma.screening.delete({ where: { id } });
     return { message: `Screening #${id} deleted successfully.` };
   }
-
 }

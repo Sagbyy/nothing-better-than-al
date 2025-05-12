@@ -55,13 +55,16 @@ describe('ScreeningService', () => {
         date,
         movieId: 1,
         movieTheaterId: 2,
-        nb_ticket: 0
+        nb_ticket: 0,
       };
 
       const result = { id: 1, ...dto };
 
       mockPrisma.movie.findUnique.mockResolvedValue({ id: 1, duration: 120 });
-      mockPrisma.movieTheater.findUnique.mockResolvedValue({ id: 2, capacity: 100 });
+      mockPrisma.movieTheater.findUnique.mockResolvedValue({
+        id: 2,
+        capacity: 100,
+      });
       mockPrisma.screening.findFirst.mockResolvedValue(null);
       mockPrisma.screening.create.mockResolvedValue(result);
 
@@ -75,7 +78,7 @@ describe('ScreeningService', () => {
           date: expect.any(String),
           movieId: 1,
           movieTheaterId: 2,
-          nb_ticket: 0
+          nb_ticket: 0,
         }),
       });
     });
@@ -123,8 +126,12 @@ describe('ScreeningService', () => {
       const result = { id: 1 };
       mockPrisma.screening.delete.mockResolvedValue(result);
 
-      expect(await service.remove(1)).toEqual({ message: 'Screening #1 deleted successfully.' });
-      expect(mockPrisma.screening.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(await service.remove(1)).toEqual({
+        message: 'Screening #1 deleted successfully.',
+      });
+      expect(mockPrisma.screening.delete).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
   });
 
@@ -141,7 +148,9 @@ describe('ScreeningService', () => {
 
       mockPrisma.movie.findUnique.mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow('Movie with ID 1 not found');
+      await expect(service.create(dto)).rejects.toThrow(
+        'Movie with ID 1 not found',
+      );
     });
 
     it('should throw if movie theater does not exist', async () => {
@@ -156,7 +165,9 @@ describe('ScreeningService', () => {
       mockPrisma.movie.findUnique.mockResolvedValue({ id: 1 });
       mockPrisma.movieTheater.findUnique.mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow('Theater with ID 1 not found');
+      await expect(service.create(dto)).rejects.toThrow(
+        'Theater with ID 1 not found',
+      );
     });
 
     it('should throw if another screening exists at the same time', async () => {
@@ -170,7 +181,10 @@ describe('ScreeningService', () => {
       };
 
       mockPrisma.movie.findUnique.mockResolvedValue({ id: 1, duration: 120 });
-      mockPrisma.movieTheater.findUnique.mockResolvedValue({ id: 1, capacity: 100 });
+      mockPrisma.movieTheater.findUnique.mockResolvedValue({
+        id: 1,
+        capacity: 100,
+      });
       mockPrisma.screening.findFirst.mockResolvedValue({
         id: 99,
         start: dto.start,
@@ -178,7 +192,6 @@ describe('ScreeningService', () => {
       });
 
       await expect(service.create(dto)).rejects.toThrow('Créneau occupé chef.');
-
     });
 
     it('should create screening if all checks pass', async () => {
@@ -199,7 +212,10 @@ describe('ScreeningService', () => {
       const expected = { id: 1, ...dto };
 
       mockPrisma.movie.findUnique.mockResolvedValue({ id: 1, duration: 120 });
-      mockPrisma.movieTheater.findUnique.mockResolvedValue({ id: 1, capacity: 100 });
+      mockPrisma.movieTheater.findUnique.mockResolvedValue({
+        id: 1,
+        capacity: 100,
+      });
       mockPrisma.screening.findFirst.mockResolvedValue(null);
       mockPrisma.screening.create.mockResolvedValue(expected);
 
